@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Gemini Deepfake Detector",
-  "version": "1.7",
+  "name": "Fakeless",
+  "version": "1.8",
   "description": "Real-time AI deepfake detection for video calls with visual summaries and risk levels.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
@@ -51,7 +51,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "deepfake-detector@jabaldoo.dev"
+      "id": "fakeless@jabaldoo.dev"
     }
   }
 }
