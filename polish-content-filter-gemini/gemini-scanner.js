@@ -9,6 +9,7 @@
             this.scanTimer = null;
             this.isScanning = false;
             this.detectedImages = new Set();
+            this.useLocalDetection = true; // Default to local detection
             
             console.log('Gemini AI Scanner initialized');
             this.loadSettings();
@@ -20,15 +21,21 @@
                     geminiEnabled: true,
                     geminiApiKey: '',
                     geminiScanInterval: 10000,
-                    geminiShowWarnings: true
+                    geminiShowWarnings: true,
+                    useLocalDetection: true // Default to local detection
                 });
                 
                 this.isEnabled = settings.geminiEnabled;
                 this.apiKey = settings.geminiApiKey;
                 this.scanInterval = settings.geminiScanInterval;
+                this.useLocalDetection = settings.useLocalDetection !== false;
                 
-                if (this.isEnabled && this.apiKey) {
-                    this.startAutomaticScanning();
+                if (this.isEnabled) {
+                    if (this.apiKey) {
+                        this.startAutomaticScanning();
+                    } else if (this.useLocalDetection) {
+                        this.startLocalScanning();
+                    }
                 }
             } catch (error) {
                 console.error('Error loading Gemini settings:', error);
@@ -356,24 +363,369 @@
             this.isEnabled = settings.geminiEnabled !== false;
             this.apiKey = settings.geminiApiKey || '';
             this.scanInterval = settings.geminiScanInterval || 10000;
+            this.useLocalDetection = settings.useLocalDetection !== false; // Default to true
             
             this.stopScanning();
-            if (this.isEnabled && this.apiKey) {
-                this.startAutomaticScanning();
-                this.showNotification('Gemini AI scanner activated', 'info');
-            } else if (!this.apiKey) {
-                this.showNotification('Gemini API key required', 'error');
+            if (this.isEnabled) {
+                if (this.apiKey) {
+                    this.startAutomaticScanning();
+                    this.showNotification('Gemini AI scanner activated', 'info');
+                } else if (this.useLocalDetection) {
+                    // Start local analysis without API key
+                    this.startLocalScanning();
+                    this.showNotification('Local AI detection activated (no API key needed)', 'info');
+                } else {
+                    this.showNotification('Gemini API key required for cloud detection', 'error');
+                }
             }
         }
-        }
+        
+        // Start scanning with local detection only
+        startLocalScanning() {
+            // Initial scan after page loads
+            setTimeout(() => {
+                this.performLocalAnalysis();
+            }, 3000);
+            
+            // Set up periodic scanning
+            this.scanTimer = setInterval(() => {
+                this.performLocalAnalysis();
+            }, this.scanInterval);
         }
 
         // Manual scan trigger
         async manualScan() {
-            this.showNotification('Starting manual Gemini AI scan...', 'info');
-            await this.performScreenAnalysis();
+            if (this.apiKey) {
+                this.showNotification('Starting manual Gemini AI scan...', 'info');
+                await this.performScreenAnalysis();
+            } else {
+                this.showNotification('Starting local AI detection...', 'info');
+                await this.performLocalAnalysis();
+            }
+        }
+
+        // Local AI detection without API - analyze each image individually
+        async performLocalAnalysis() {
+            if (this.isScanning || !this.isEnabled) return;
+            
+            this.isScanning = true;
+            console.log('Starting local AI image analysis...');
+            
+            const images = document.querySelectorAll('img');
+            let aiImageCount = 0;
+            let analyzedCount = 0;
+            let errorCount = 0;
+            
+            for (const img of images) {
+                // Skip small images
+                if (img.width < 100 || img.height < 100) continue;
+                
+                // Skip already analyzed
+                if (img.dataset.aiAnalyzed) continue;
+                
+                // Skip images that haven't loaded yet or have invalid dimensions
+                if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    continue;
+                }
+                
+                try {
+                    const score = await this.analyzeImageLocally(img);
+                    
+                    if (score > 0.3) { // Threshold for AI detection
+                        aiImageCount++;
+                        this.showImagePercentage(img, score);
+                    }
+                    
+                    img.dataset.aiAnalyzed = 'true';
+                    analyzedCount++;
+                    
+                } catch (e) {
+                    errorCount++;
+                    // If CORS error, try URL-based fallback
+                    if (e.message && e.message.includes('CORS') || e.message.includes('insecure') || e.message.includes('tainted')) {
+                        try {
+                            const fallbackScore = this.analyzeImageByURL(img);
+                            if (fallbackScore > 0.4) {
+                                aiImageCount++;
+                                this.showImagePercentage(img, fallbackScore);
+                            }
+                            img.dataset.aiAnalyzed = 'true';
+                            analyzedCount++;
+                        } catch (fallbackErr) {
+                            if (errorCount <= 3) {
+                                console.log('URL analysis also failed:', fallbackErr.message);
+                            }
+                        }
+                    } else if (errorCount <= 5) {
+                        console.log('Could not analyze image:', e.message || e);
+                    }
+                }
+            }
+            
+            console.log(`Analysis complete: ${analyzedCount} analyzed, ${aiImageCount} AI detected, ${errorCount} errors`);
+            
+            if (aiImageCount > 0) {
+                this.showNotification(`Detected ${aiImageCount} potentially AI-generated images`, 'warning');
+            }
+            
+            this.isScanning = false;
+        }
+        
+        // URL-based heuristic analysis (fallback for CORS-blocked images)
+        analyzeImageByURL(img) {
+            const src = img.src || '';
+            let score = 0.1; // Base score
+            
+            // Check for AI-generated image URL patterns
+            const aiPatterns = [
+                /openai/i, /dalle/i, /midjourney/i, /stable-diffusion/i,
+                /craiyon/i, /dreamstudio/i, /nightcafe/i, /artbreeder/i,
+                /thispersondoesnotexist/i, /generated/i, /ai-art/i,
+                /deepdream/i, /wombo/i, /starryai/i, /jasper/i,
+                /photos\.google\.com/i, /lh3\.googleusercontent/i
+            ];
+            
+            // Check dimensions for common AI generation sizes
+            const aiSizes = [256, 512, 768, 1024];
+            if (aiSizes.includes(img.naturalWidth) && aiSizes.includes(img.naturalHeight)) {
+                if (img.naturalWidth === img.naturalHeight) {
+                    score += 0.15; // Square images common in AI
+                }
+            }
+            
+            // Check URL for AI patterns
+            for (const pattern of aiPatterns) {
+                if (pattern.test(src)) {
+                    score += 0.3;
+                    break;
+                }
+            }
+            
+            // Check for suspiciously clean filenames (random strings common in AI)
+            if (/\/[a-f0-9]{16,32}/i.test(src)) {
+                score += 0.1;
+            }
+            
+            // Check for thumbnail indicators (often AI thumbnails)
+            if (/thumb|preview|small/i.test(src)) {
+                score += 0.05;
+            }
+            
+            return Math.min(score, 0.7); // Cap lower since this is just URL-based
+        }
+
+        // Analyze single image locally using canvas
+        async analyzeImageLocally(img) {
+            return new Promise((resolve, reject) => {
+                // Validate image dimensions
+                if (!img.naturalWidth || !img.naturalHeight || img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    reject(new Error('Image has invalid dimensions'));
+                    return;
+                }
+                
+                // Try with CORS handling
+                const tryAnalyze = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Scale down for performance
+                    const maxSize = 200;
+                    const scale = Math.min(maxSize / img.naturalWidth, maxSize / img.naturalHeight, 1);
+                    
+                    // Ensure dimensions are valid integers
+                    canvas.width = Math.max(1, Math.floor(img.naturalWidth * scale));
+                    canvas.height = Math.max(1, Math.floor(img.naturalHeight * scale));
+                    
+                    try {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const score = this.calculateAIScore(imageData.data, canvas.width, canvas.height);
+                        resolve(score);
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                
+                // Check if image is cross-origin
+                const isCrossOrigin = img.src && (
+                    img.src.startsWith('http') && 
+                    !img.src.startsWith(window.location.origin)
+                );
+                
+                if (isCrossOrigin && !img.crossOrigin) {
+                    // Try to reload with CORS
+                    const newImg = new Image();
+                    newImg.crossOrigin = 'anonymous';
+                    newImg.onload = () => {
+                        // Replace the original image reference for analysis
+                        Object.defineProperty(img, 'naturalWidth', { value: newImg.naturalWidth, writable: false });
+                        Object.defineProperty(img, 'naturalHeight', { value: newImg.naturalHeight, writable: false });
+                        tryAnalyze();
+                    };
+                    newImg.onerror = () => {
+                        reject(new Error('CORS blocked - cannot analyze cross-origin image'));
+                    };
+                    newImg.src = img.src;
+                } else {
+                    tryAnalyze();
+                }
+            });
+        }
+        
+        // Calculate AI likelihood score based on image characteristics
+        calculateAIScore(data, width, height) {
+            let score = 0.1; // Base score
+            
+            // Check for unnatural smoothness (AI images often lack noise)
+            const noiseLevel = this.calculateNoiseLevel(data);
+            if (noiseLevel < 20) score += 0.25; // Too smooth
+            if (noiseLevel > 20 && noiseLevel < 40) score += 0.15; // Moderate smoothness
+            
+            // Check color uniformity (AI images often have unusual color patterns)
+            const colorVariance = this.calculateColorVariance(data);
+            if (colorVariance < 50) score += 0.2; // Too uniform
+            
+            // Check for sharpness artifacts
+            const edgeArtifacts = this.detectEdgeArtifacts(data, width, height);
+            if (edgeArtifacts > 0.3) score += 0.2;
+            
+            // Check for repetitive patterns
+            const repetition = this.detectRepetitivePatterns(data, width, height);
+            if (repetition > 0.4) score += 0.15;
+            
+            return Math.min(score, 0.95); // Cap at 95%
+        }
+        
+        calculateNoiseLevel(data) {
+            let totalVariance = 0;
+            let samples = 0;
+            
+            for (let i = 0; i < data.length - 4; i += 16) { // Sample every 4th pixel
+                const r1 = data[i];
+                const g1 = data[i + 1];
+                const b1 = data[i + 2];
+                const r2 = data[i + 4];
+                const g2 = data[i + 5];
+                const b2 = data[i + 6];
+                
+                const diff = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
+                totalVariance += diff;
+                samples++;
+            }
+            
+            return samples > 0 ? totalVariance / samples : 0;
+        }
+        
+        calculateColorVariance(data) {
+            const colorCounts = {};
+            let samples = 0;
+            
+            for (let i = 0; i < data.length; i += 12) { // Sample every 3rd pixel
+                const r = Math.floor(data[i] / 32) * 32;
+                const g = Math.floor(data[i + 1] / 32) * 32;
+                const b = Math.floor(data[i + 2] / 32) * 32;
+                const key = `${r},${g},${b}`;
+                colorCounts[key] = (colorCounts[key] || 0) + 1;
+                samples++;
+            }
+            
+            const uniqueColors = Object.keys(colorCounts).length;
+            return (uniqueColors / samples) * 100;
+        }
+        
+        detectEdgeArtifacts(data, width, height) {
+            let artifacts = 0;
+            let checks = 0;
+            
+            for (let y = 1; y < height - 1; y += 2) {
+                for (let x = 1; x < width - 1; x += 2) {
+                    const idx = (y * width + x) * 4;
+                    const left = (y * width + (x - 1)) * 4;
+                    const right = (y * width + (x + 1)) * 4;
+                    
+                    const diff = Math.abs(data[idx] - data[left]) + Math.abs(data[idx + 1] - data[left + 1]) + Math.abs(data[idx + 2] - data[left + 2]);
+                    const diff2 = Math.abs(data[idx] - data[right]) + Math.abs(data[idx + 1] - data[right + 1]) + Math.abs(data[idx + 2] - data[right + 2]);
+                    
+                    if (diff > 100 && diff2 > 100) artifacts++;
+                    checks++;
+                }
+            }
+            
+            return checks > 0 ? artifacts / checks : 0;
+        }
+        
+        detectRepetitivePatterns(data, width, height) {
+            const patterns = new Set();
+            let checks = 0;
+            
+            for (let y = 0; y < height - 10; y += 5) {
+                for (let x = 0; x < width - 10; x += 5) {
+                    const idx = (y * width + x) * 4;
+                    const pattern = `${data[idx]},${data[idx + 1]},${data[idx + 2]}`;
+                    patterns.add(pattern);
+                    checks++;
+                }
+            }
+            
+            return checks > 0 ? patterns.size / checks : 0;
+        }
+        
+        // Show percentage overlay on image
+        showImagePercentage(img, score) {
+            const percentage = Math.round(score * 100);
+            
+            // Create container if needed
+            let container = img.parentElement;
+            if (!container.classList.contains('gemini-container')) {
+                container = document.createElement('div');
+                container.style.cssText = 'position: relative; display: inline-block;';
+                container.className = 'gemini-container';
+                img.parentNode.insertBefore(container, img);
+                container.appendChild(img);
+            }
+            
+            // Create percentage label
+            const label = document.createElement('div');
+            label.className = 'ai-percentage-label';
+            label.textContent = `${percentage}% AI`;
+            label.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: bold;
+                z-index: 10000;
+                font-family: Arial, sans-serif;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                border: 2px solid rgba(255,255,255,0.3);
+            `;
+            
+            // Add overlay for high confidence
+            if (percentage > 50) {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 107, 107, 0.1);
+                    border: 3px solid #ff6b6b;
+                    pointer-events: none;
+                    z-index: 9999;
+                    box-sizing: border-box;
+                `;
+                container.appendChild(overlay);
+            }
+            
+            container.appendChild(label);
         }
     }
 
     // Create global instance
     window.geminiScanner = new GeminiAIScanner();
+})();

@@ -1,17 +1,13 @@
 {
   "manifest_version": 2,
-  "name": "Polish Content Filter & Gemini AI Scanner",
+  "name": "Fakeless",
   "version": "1.0",
-  "description": "Filters Polish swear words and uses Google Gemini AI to detect AI-generated images",
+  "description": "AI-generated image detector - identifies fake and synthetic images on the web",
 
   "permissions": [
     "activeTab",
     "storage",
-    "desktopCapture",
-    "tabs"
-  ],
-
-  "host_permissions": [
+    "tabs",
     "https://generativelanguage.googleapis.com/*"
   ],
 
@@ -28,10 +24,21 @@
     }
   ],
 
+  "icons": {
+    "16": "logo_bez_tla.png",
+    "32": "logo_bez_tla.png",
+    "48": "logo_bez_tla.png",
+    "128": "logo_bez_tla.png"
+  },
+
   "options_page": "options.html",
 
   "browser_action": {
-    "default_title": "Polish Content Filter & Gemini AI Scanner"
+    "default_title": "Fakeless",
+    "default_icon": {
+      "16": "logo_bez_tla.png",
+      "32": "logo_bez_tla.png"
+    }
   },
 
   "applications": {

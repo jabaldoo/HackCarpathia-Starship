@@ -1,6 +1,210 @@
 (function() {
     'use strict';
 
+    // ========== ADULT CONTENT BLOCKING ==========
+    const adultKeywords = {
+        // English adult/pornography terms
+        english: [
+            'porn', 'porno', 'pornography', 'xxx', 'sex', 'sexy', 'nude', 'naked', 'nudity',
+            'adult', 'erotic', 'erotica', 'hentai', 'blowjob', 'handjob', 'anal', 'oral',
+            'vagina', 'penis', 'cock', 'dick', 'pussy', 'tits', 'boobs', 'breasts', 'ass',
+            'fuck', 'fucking', 'milf', 'gilf', 'teen', 'amateur', 'webcam', 'camgirl',
+            'escort', 'prostitute', 'brothel', 'bdsm', 'bondage', 'fetish', 'kink',
+            'masturbation', 'masturbate', 'orgasm', 'ejaculation', 'cum', 'sperm',
+            'hardcore', 'softcore', 'lesbian', 'gay porn', 'trans porn', 'shemale',
+            'deepthroat', 'gangbang', 'threesome', 'foursome', 'orgy', 'swinger',
+            'creampie', 'facial', 'cumshot', 'bukkake', 'gape', 'fisting', 'squirt',
+            'interracial', 'incest', 'taboo', 'stepmom', 'stepsis', 'stepbro',
+            'onlyfans', 'fansly', 'manyvids', 'pornhub', 'xvideos', 'xhamster',
+            'redtube', 'youporn', 'tube8', 'spankbang', 'chaturbate', 'myfreecams',
+            'brazzers', 'bangbros', 'realitykings', 'naughtyamerica', 'playboy',
+            'penthouse', 'hustler', 'vivid', 'kink', 'nubiles', 'metart', 'femjoy',
+            'twistys', 'digitalplayground', 'elegantangel', 'wicked', 'private',
+            'dorcel', 'marc dorcel', 'legalporno', 'tushy', 'blacked', 'vixen',
+            'mofos', 'mofosex', 'beeg', 'spankwire', 'sunporno', 'pornicom',
+            'pornhat', 'porntrex', 'pornmz', 'pornhubs', 'pornheed', 'pornburst',
+            'pornito', 'pornjam', 'pornkay', 'pornlib', 'pornone', 'pornoxo',
+            'pornper', 'pornrox', 'pornsocket', 'pornstar', 'pornsteep',
+            'porntop', 'porntube', 'pornuru', 'pornwild', 'pornworld'
+        ],
+        // Polish adult/pornography terms
+        polish: [
+            'porno', 'sex', 'seks', 'nagie', 'nagi', 'naga', 'nagich', 'nago',
+            'erotyka', 'erotyczny', 'erotyczna', 'erotyczne', 'erotyk',
+            'gwiazda porno', 'gwiazdy porno', 'film porno', 'filmy porno',
+            'wideo porno', 'sex kamerki', 'sex telefon', 'sex anonse',
+            'anonse erotyczne', 'ogłoszenia towarzyskie', 'seks oferty',
+            'dziwka', 'dziwki', 'kurwa', 'kurewka', 'szmata', 'fetysz',
+            'bdsm', 'pederasta', 'pedał', 'lesbijka', 'lesbijki', 'gej',
+            'masturbacja', 'masturbowac', 'orgazm', 'wytrysk', 'sperma',
+            'penis', 'członek', 'kutas', 'fiut', 'cipa', 'pizda', 'wagina',
+            'cycki', 'cycuszki', 'biust', 'piersi', 'tyłek', 'dupa', 'dupcia',
+            'ujawniacz', 'nudesy', 'nudes', 'nude', 'naked', 'nagość',
+            'striptiz', 'striptizerka', 'tancerka erotyczna', 'tancerka go-go',
+            'klub go-go', 'klub nocny', 'burdel', 'dom publiczny', 'agencja towarzyska',
+            'prostytutka', 'prostytutki', 'seks praca', 'praca w seksie',
+            'seks za pieniadze', ' sponsoring', 'sugar daddy', 'sugar baby',
+            'układ', 'układzik', 'sex spotkania', 'sex randki', 'sex anonse',
+            'sex ogłoszenia', 'sex oferty', 'sex priv', 'sex privy',
+            'sex warszawa', 'sex krakow', 'sex wroclaw', 'sex gdansk',
+            'sex katowice', 'sex poznan', 'sex lodz', 'sex szczecin',
+            'sex bydgoszcz', 'sex lublin', 'sex bialystok', 'sex gdynia',
+            'sex sopot', 'sex zakopane', 'sex polska', 'polskie porno',
+            'polski sex', 'polskie dziewczyny', 'polskie amatorki'
+        ]
+    };
+
+    // Adult/pornographic domains to block
+    const adultDomains = [
+        'pornhub.com', 'xvideos.com', 'xhamster.com', 'redtube.com', 'youporn.com',
+        'tube8.com', 'spankbang.com', 'chaturbate.com', 'myfreecams.com',
+        'brazzers.com', 'bangbros.com', 'realitykings.com', 'naughtyamerica.com',
+        'playboy.com', 'penthouse.com', 'hustler.com', 'vivid.com',
+        'onlyfans.com', 'fansly.com', 'manyvids.com', 'justfor.fans',
+        'porn.com', 'porno.com', 'sex.com', 'xxx.com', 'xvideo.com',
+        'beeg.com', 'spankwire.com', 'sunporno.com', 'pornicom.com',
+        'pornhat.com', 'porntrex.com', 'pornmz.com', 'pornheed.com',
+        'pornburst.com', 'pornito.com', 'pornjam.com', 'pornkay.com',
+        'pornlib.com', 'pornone.com', 'pornoxo.com', 'pornper.com',
+        'pornrox.com', 'pornsocket.com', 'pornstar.com', 'porntop.com',
+        'porntube.com', 'pornuru.com', 'pornwild.com', 'pornworld.com',
+        'xhamsterlive.com', 'stripchat.com', 'bongacams.com', 'cam4.com',
+        'livejasmin.com', 'imlive.com', 'streamate.com', 'flirt4free.com',
+        'camsoda.com', 'jerkmate.com', 'slutroulette.com', 'lucky crush',
+        'omegle.com', 'ome.tv', 'chatroulette.com', 'bazoocam.org',
+        'redtube.com.pl', 'youporn.pl', 'pornhub.pl', 'sex.pl', 'erotyka.pl',
+        'sexkamerki.pl', 'polskieporno.pl', 'pornopolskie.pl'
+    ];
+
+    // Check if we're on an adult site
+    function isAdultSite() {
+        const hostname = window.location.hostname.toLowerCase();
+        const pathname = window.location.pathname.toLowerCase();
+        
+        // Check domain
+        for (const domain of adultDomains) {
+            if (hostname.includes(domain)) return true;
+        }
+        
+        return false;
+    }
+
+    // Check if Google search contains adult terms
+    function checkGoogleSearchForAdultContent() {
+        const hostname = window.location.hostname;
+        const pathname = window.location.pathname;
+        const searchParams = new URLSearchParams(window.location.search);
+        const query = searchParams.get('q') || '';
+        
+        // Check if on Google
+        if (!hostname.includes('google')) return false;
+        
+        // Check if it's a search page
+        if (!pathname.includes('/search') && !pathname.includes('/webhp')) return false;
+        
+        // Check search query for adult terms
+        const queryLower = query.toLowerCase();
+        const allAdultTerms = [...adultKeywords.english, ...adultKeywords.polish];
+        
+        for (const term of allAdultTerms) {
+            if (queryLower.includes(term.toLowerCase())) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    // Create full-screen blocker
+    function createBlockerScreen() {
+        // Remove any existing blocker
+        const existing = document.getElementById('fakeless-blocker');
+        if (existing) existing.remove();
+        
+        const blocker = document.createElement('div');
+        blocker.id = 'fakeless-blocker';
+        blocker.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            z-index: 2147483647;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+        `;
+        
+        blocker.innerHTML = `
+            <div style="max-width: 600px; padding: 40px;">
+                <h1 style="font-size: 48px; margin-bottom: 20px; color: #e94560;">
+                    🚫 ACCESS DENIED
+                </h1>
+                <p style="font-size: 24px; margin-bottom: 30px; line-height: 1.6;">
+                    You can't get here<br>
+                    Go back to safe seas
+                </p>
+                <p style="font-size: 16px; margin-bottom: 40px; color: #a0a0a0;">
+                    This content has been blocked by FakeLess<br>
+                    to keep your browsing safe and family-friendly.
+                </p>
+                <button id="fakeless-go-back" style="
+                    background: linear-gradient(135deg, #e94560, #ff6b6b);
+                    color: white;
+                    padding: 15px 40px;
+                    font-size: 18px;
+                    border: none;
+                    border-radius: 30px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+                    transition: transform 0.2s;
+                ">Return to Safety</button>
+            </div>
+        `;
+        
+        document.body.appendChild(blocker);
+        
+        // Add click handler for the button
+        document.getElementById('fakeless-go-back').addEventListener('click', function() {
+            window.location.href = 'https://www.google.com';
+        });
+        
+        // Auto-redirect after 5 seconds
+        setTimeout(() => {
+            window.location.href = 'https://www.google.com';
+        }, 5000);
+    }
+
+    // Main blocking function
+    function blockIfAdultContent() {
+        // Check for adult site
+        if (isAdultSite()) {
+            createBlockerScreen();
+            return true;
+        }
+        
+        // Check for adult Google search
+        if (checkGoogleSearchForAdultContent()) {
+            createBlockerScreen();
+            return true;
+        }
+        
+        return false;
+    }
+
+    // Run blocking check immediately
+    if (blockIfAdultContent()) {
+        // If blocked, stop here
+        return;
+    }
+
+    // Continue with rest of content filtering...
+
     // Comprehensive dictionary of Polish swear words, insults and negative terms
     const offensiveWords = [
         // Basic swear words
