@@ -50,13 +50,16 @@
         <button id="gemini-close" style="background:none; border:none; color:white; cursor:pointer; font-size:18px;">×</button>
       </div>
       <div class="gemini-content" style="padding:15px; color:#333;">
-        <div id="gemini-status" style="text-align:center; font-weight:bold; margin-bottom:10px;">READY</div>
+        <div style="display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
+          <img id="gemini-lvl-icon" style="width:40px; height:40px; display:none;" />
+          <div id="gemini-status" style="font-weight:bold; margin-left:10px;">READY</div>
+        </div>
         <div id="gemini-snapshot-container" style="width:100%; height:150px; background:#eee; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #ddd;">
            <img id="gemini-snapshot" style="display:none; max-width:100%; max-height:100%;" />
            <span id="gemini-placeholder" style="color:#666; font-size:12px;">Waiting for scan...</span>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-           <span>Probability</span>
+           <span id="gemini-trust-label">Deepfake Score</span>
            <span id="gemini-percent">0%</span>
         </div>
         <div style="height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:10px;">
@@ -99,7 +102,9 @@
     clearInterval(scanInterval);
     if (faceBox) faceBox.style.display = 'none';
     const status = document.getElementById('gemini-status');
+    const icon = document.getElementById('gemini-lvl-icon');
     if (status) status.innerText = 'SCAN STOPPED';
+    if (icon) icon.style.display = 'none';
   }
 
   async function performScan() {
@@ -126,13 +131,12 @@
         apiKey = data.geminiApiKey;
       }
 
-      // Updated to gemini-2.5-flash as requested
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           contents: [{ parts: [
-            { text: "Analyze this video call frame. Detect if it is a deepfake. Return exactly: 'SCORE: [0-100]' and 'REASON: [short explanation]'. Also find the main face and return 'BOX: [ymin, xmin, ymax, xmax]' in 0-1000 normalized coords." },
+            { text: "Analyze this video call frame. Detect if it is a deepfake. Return exactly: 'SCORE: [0-100]' (where 100 is fake and 0 is real) and 'REASON: [short explanation]'. Also find the main face and return 'BOX: [ymin, xmin, ymax, xmax]' in 0-1000 normalized coords." },
             { inline_data: { mime_type: "image/jpeg", data: base64Image } }
           ]}]
         })
@@ -142,7 +146,6 @@
       if (data.error) throw new Error(data.error.message);
 
       const text = data.candidates[0].content.parts[0].text;
-      console.log('Gemini Result:', text);
 
       chrome.runtime.sendMessage({
         action: "updateUI",
@@ -152,8 +155,10 @@
 
       const boxMatch = text.match(/BOX:\s*\[(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\]/i);
       if (boxMatch) {
+        const scoreMatch = text.match(/SCORE:\s*(\d+)/i);
+        const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
         const [ymin, xmin, ymax, xmax] = boxMatch.slice(1).map(Number);
-        updateFaceBox(video, ymin, xmin, ymax, xmax, text.includes('SCORE') && parseInt(text.match(/SCORE:\s*(\d+)/)[1]) > 50);
+        updateFaceBox(video, ymin, xmin, ymax, xmax, score);
       }
     } catch (e) {
       console.error('Scan Error:', e);
@@ -168,6 +173,7 @@
 
   function updateUI(msg) {
     const status = document.getElementById('gemini-status');
+    const icon = document.getElementById('gemini-lvl-icon');
     const percent = document.getElementById('gemini-percent');
     const progress = document.getElementById('gemini-progress');
     const results = document.getElementById('gemini-results');
@@ -177,14 +183,40 @@
     const scoreMatch = msg.text.match(/SCORE:\s*(\d+)/i);
     const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
 
+    let trustText = "";
+    let color = "";
+    let iconName = "";
+
+    if (score <= 25) {
+      trustText = "REAL";
+      color = "#1e8e3e";
+      iconName = "lvl1.png";
+    } else if (score <= 50) {
+      trustText = "MOST LIKELY REAL";
+      color = "#8ab4f8";
+      iconName = "lvl2.png";
+    } else if (score <= 75) {
+      trustText = "NOT SO REAL";
+      color = "#f9ab00";
+      iconName = "lvl3.png";
+    } else {
+      trustText = "FAKE";
+      color = "#d93025";
+      iconName = "lvl4.png";
+    }
+
     if (status) {
-      status.innerText = score > 50 ? '⚠️ HIGH RISK' : '✅ AUTHENTIC';
-      status.style.color = score > 50 ? '#d93025' : '#1e8e3e';
+      status.innerText = trustText;
+      status.style.color = color;
+    }
+    if (icon) {
+      icon.src = chrome.runtime.getURL('lvl/' + iconName);
+      icon.style.display = 'block';
     }
     if (percent) percent.innerText = score + '%';
     if (progress) {
       progress.style.width = score + '%';
-      progress.style.background = score > 50 ? '#d93025' : '#1e8e3e';
+      progress.style.background = color;
     }
     if (results) results.innerText = msg.text.split('REASON:')[1] || msg.text;
     if (img) {
@@ -194,7 +226,7 @@
     }
   }
 
-  function updateFaceBox(video, ymin, xmin, ymax, xmax, isFake) {
+  function updateFaceBox(video, ymin, xmin, ymax, xmax, score) {
     if (!faceBox) {
       faceBox = document.createElement('div');
       faceBox.id = 'gemini-face-overlay';
@@ -207,7 +239,14 @@
     faceBox.style.height = ((ymax - ymin) / 1000 * rect.height) + 'px';
     faceBox.style.left = (window.scrollX + rect.left + (xmin / 1000 * rect.width)) + 'px';
     faceBox.style.top = (window.scrollY + rect.top + (ymin / 1000 * rect.height)) + 'px';
-    faceBox.style.borderColor = isFake ? '#d93025' : '#1e8e3e';
+
+    let color = "";
+    if (score <= 25) color = "#1e8e3e";
+    else if (score <= 50) color = "#8ab4f8";
+    else if (score <= 75) color = "#f9ab00";
+    else color = "#d93025";
+
+    faceBox.style.borderColor = color;
   }
 
   function makeDraggable(el) {
