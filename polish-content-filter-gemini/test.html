@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Polish Content Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .original {
+            background-color: #ffe6e6;
+        }
+        .filtered {
+            background-color: #e6ffe6;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 5px;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test - Polish Content Filter</h1>
+    
+    <div class="instructions">
+        <h2>Instrukcje testowania</h2>
+        <p><strong>Kroki:</strong></p>
+        <ol>
+            <li>Zainstaluj wtyczk w Firefox (about:debugging -> Load Temporary Add-on)</li>
+            <li>Otwrz ten plik w przegladrce</li>
+            <li>Obserwuj, jak wulgaryzmy s zastpowane przez #</li>
+            <li>Przejd do opcji wtyczki, aby dostosowa ustawienia</li>
+        </ol>
+        <p><strong>Oczekiwany rezultat:</strong> Wszystkie wulgaryzmy poniej powinny zosta zastpione znakiem #</p>
+    </div>
+
+    <div class="test-section original">
+        <h2>Tekst oryginalny (przed filtrowaniem)</h2>
+        <p>Ten tekst zawiera rne wulgaryzmy i wyzwiska, ktre powinny zosta przefiltrowane:</p>
+        <ul>
+            <li>To jest <strong>kurwa</strong> nieprawdopodobne!</li>
+            <li>Jebac si w dupe, to jest <strong>debil</strong>.</li>
+            <li>Ten <strong>idiota</strong> nic nie rozumie.</li>
+            <li>Co za <strong>gupiec</strong>, nie moe tego poj.</li>
+            <li>Ten <strong>kretyn</strong> znowu zepsu wszystko.</li>
+            <li>Co za <strong>baran</strong>, niczego nie sucha.</li>
+            <li>Ten <strong>osio</strong> nie ma pojcia.</li>
+            <li>Co za <strong>pajac</strong>, robi z siebie gupca.</li>
+            <li>Ten <strong>gnojek</strong> znowu koo.</li>
+            <li>Co za <strong>szmata</strong>, brudna i brzydka.</li>
+            <li>Ta <strong>suka</strong> tylko narzeka.</li>
+            <li>Co za <strong>skurwysyn</strong>, nie ma honoru.</li>
+            <li>Ten <strong>cwel</strong> powinien si wstydzi.</li>
+            <li>Co za <strong>pedal</strong>, obrzydliwy typ.</li>
+            <li>Ten <strong>frajer</strong> da si oszuka.</li>
+            <li>Co za <strong>kujon</strong>, uczy si bez przerwy.</li>
+            <li>Ten <strong>leszcz</strong> nie ma ycia.</li>
+            <li>Co za <strong>nerd</strong>, tylko w komputer siedzi.</li>
+            <li>Ten <strong>gówniarz</strong> znowu brudny.</li>
+            <li>Co za <strong>brudas</strong>, nigdy si nie myje.</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Tekst z wulgaryzmami w rnych formach</h2>
+        <p>Ten tekst zawiera wulgaryzmy w rnych odmianach gramatycznych:</p>
+        <blockquote>
+            <p>Ten <strong>jebany</strong> debil znowu tu przyby. Co za <strong>pierdolona</strong> sytuacja. 
+            <strong>Sraj</strong> na to wszystko. Ten <strong>skurwiel</strong> mnie wkurwia. 
+            Co za <strong>obrzydliwy</strong> typ. <strong>Pierdol</strong> to wszystko. 
+            Ten <strong>zjeb</strong> nic nie pojmuje. <strong>Kurwa</strong> ma, co si dzieje.</p>
+        </blockquote>
+    </div>
+
+    <div class="test-section">
+        <h2>Tekst z przeklenstwami</h2>
+        <p>Rne formy przeklestw:</p>
+        <blockquote>
+            <p><strong>Jebac</strong> to wszystko. <strong>Pierdol</strong> si w ko. 
+            <strong>Sra</strong> na to. <strong>Kurwa</strong> jego ma. 
+            <strong>Pizda</strong> jego matka. <strong>Chuj</strong> wie co.</p>
+        </blockquote>
+    </div>
+
+    <div class="test-section">
+        <h2>Tekst z negatywnymi przymiotnikami</h2>
+        <p>Opisy negatywnych cech:</p>
+        <blockquote>
+            <p>Ten czowiek jest <strong>brzydki</strong>, <strong>brudny</strong> i <strong>wstrtny</strong>. 
+            Ma <strong>obrzydliwy</strong> charakter i jest <strong>odpychajcy</strong>. 
+            To jest <strong>straszny</strong> i <strong>okropny</strong> czowiek.</p>
+        </blockquote>
+    </div>
+
+    <div class="test-section">
+        <h2>Tekst z mieszanki wulgaryzmów</h2>
+        <p>Zdania z wieloma wulgaryzmami:</p>
+        <blockquote>
+            <p>Ten <strong>jebany</strong> <strong>debil</strong> i <strong>kurwa</strong> <strong>skurwysyn</strong> 
+            znowu <strong>pierdol</strong> wszystko. Co za <strong>gupiec</strong> i <strong>idiot</strong>, 
+            nic nie rozumie. <strong>Pierdol</strong> to wszystko, <strong>jebac</strong> ich wszystkich.</p>
+        </blockquote>
+    </div>
+
+    <div class="test-section">
+        <h2>Tekst testowy dynamiczny</h2>
+        <p>Ten tekst zostanie dodany dynamicznie przez JavaScript:</p>
+        <div id="dynamic-content">
+            <!-- Content will be added here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Formularz testowy</h2>
+        <form>
+            <label for="test-input">Wpisz tekst z wulgaryzmami:</label><br>
+            <input type="text" id="test-input" style="width: 300px; padding: 5px;" 
+                   placeholder="np. ten debil to kurwa idiota">
+            <br><br>
+            <textarea id="test-textarea" style="width: 100%; height: 100px;" 
+                      placeholder="Wpisz dugszy tekst z wulgaryzmami..."></textarea>
+        </form>
+    </div>
+
+    <script>
+        // Add dynamic content to test the observer
+        setTimeout(() => {
+            const dynamicDiv = document.getElementById('dynamic-content');
+            dynamicDiv.innerHTML = '<p>Ten <strong>dynamiczny</strong> tekst zawiera <strong>kurwa</strong> i <strong>debila</strong>.</p>';
+        }, 2000);
+
+        // Add more content after 5 seconds
+        setTimeout(() => {
+            const dynamicDiv = document.getElementById('dynamic-content');
+            dynamicDiv.innerHTML += '<p>Dodatkowy <strong>jebany</strong> tekst z <strong>pierdolonymi</strong> wulgaryzmami.</p>';
+        }, 5000);
+
+        // Test form inputs
+        document.getElementById('test-input').value = 'Ten debil to kurwa idiota';
+        document.getElementById('test-textarea').value = 'To jest przykadowy tekst z wulgaryzmami. Ten jebany debil znowu koo. Co za skurwysyn, nic nie rozumie. Pierdol to wszystko.';
+    </script>
+</body>
+</html>

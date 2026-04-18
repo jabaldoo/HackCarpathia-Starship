@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+  "name": "Polish Content Filter & Gemini AI Scanner",
+  "version": "1.0",
+  "description": "Filters Polish swear words and uses Google Gemini AI to detect AI-generated images",
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "desktopCapture",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["gemini-scanner.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "options_page": "options.html",
+
+  "browser_action": {
+    "default_title": "Polish Content Filter & Gemini AI Scanner"
+  },
+
+  "applications": {
+    "gecko": {
+      "id": "polish-content-filter-gemini@hackaton-rzeszow.pl"
+    }
+  }
+}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Scanner Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 5px;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .image-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 3px;
+        }
+        .image-container h4 {
+            margin: 10px 0 5px 0;
+            color: #555;
+        }
+        .image-container p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .status {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <h1>Deepfake Scanner Test Page</h1>
+    
+    <div class="instructions">
+        <h2>Instrukcje testowania</h2>
+        <p><strong>Kroki:</strong></p>
+        <ol>
+            <li>Zainstaluj wtyczk Polish Content Filter z deepfake scannerem</li>
+            <li>Otwrz ten plik w przegladrce</li>
+            <li>Obserwuj, jak obrazy s skanowane w poszukiwaniu oznak deepfake</li>
+            <li>Podejrzane obrazy zostan oznaczone czerwon ramk</li>
+            <li>Kliknij na podejrzany obraz, aby zobaczy szczegóy</li>
+        </ol>
+        <p><strong>Oczekiwany rezultat:</strong> Obrazy z oznakami manipulacji zostan oznaczone jako podejrzane</p>
+    </div>
+
+    <div class="status">
+        <h2>Status skanera</h2>
+        <p id="scanner-status">Sprawdzanie statusu skanera...</p>
+        <p id="scan-progress">Postp skanowania: oczekiwanie...</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Testowe obrazy</h2>
+        <p>Poni znajduj si obrazy testowe, ktre zostan przeskanowane przez wtyczk:</p>
+        
+        <div class="image-grid">
+            <div class="image-container">
+                <h4>Obraz testowy 1 - Portret</h4>
+                <p>Ten obraz powinien zosta przeskanowany pod ktem oznak manipulacji twarzy.</p>
+                <img src="https://picsum.photos/seed/portrait1/400/300.jpg" alt="Test portrait 1">
+            </div>
+            
+            <div class="image-container">
+                <h4>Obraz testowy 2 - Krajobraz</h4>
+                <p>Ten obraz zawiera elementy krajobrazu, ktre mog by manipulowane.</p>
+                <img src="https://picsum.photos/seed/landscape1/400/300.jpg" alt="Test landscape 1">
+            </div>
+            
+            <div class="image-container">
+                <h4>Obraz testowy 3 - Grupa ludzi</h4>
+                <p>Ten obraz zawiera wiele twarzy, ktre s skanowane pod ktem autentycznoci.</p>
+                <img src="https://picsum.photos/seed/people1/400/300.jpg" alt="Test people 1">
+            </div>
+            
+            <div class="image-container">
+                <h4>Obraz testowy 4 - Abstrakcja</h4>
+                <p>Ten obraz abstrakcyjny moe zawiera ukryte oznaki manipulacji.</p>
+                <img src="https://picsum.photos/seed/abstract1/400/300.jpg" alt="Test abstract 1">
+            </div>
+            
+            <div class="image-container">
+                <h4>Obraz testowy 5 - Miejska scena</h4>
+                <p>Obraz miejski z potencjalnie manipulowanymi elementami.</p>
+                <img src="https://picsum.photos/seed/city1/400/300.jpg" alt="Test city 1">
+            </div>
+            
+            <div class="image-container">
+                <h4>Obraz testowy 6 - Zwierzta</h4>
+                <p>Obraz zawierajcy zwierzta, ktre mog by tematem manipulacji.</p>
+                <img src="https://picsum.photos/seed/animals1/400/300.jpg" alt="Test animals 1">
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Dynamicznie dodawane obrazy</h2>
+        <p>Ten sekcja bdzie dynamicznie dodawana przez JavaScript:</p>
+        <div id="dynamic-images">
+            <!-- Images will be added here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test wydajnoci</h2>
+        <p>Ten sekcja zawiera wiele maych obrazw do testowania wydajnoci skanera:</p>
+        <div id="performance-test">
+            <!-- Small images will be added here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Kontrola skanera</h2>
+        <button onclick="startManualScan()" style="background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px;">Rozpocznij skanowanie rcznie</button>
+        <button onclick="stopManualScan()" style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px;">Zatrzymaj skanowanie</button>
+        <button onclick="clearWarnings()" style="background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Wyczy ostrzeenia</button>
+    </div>
+
+    <script>
+        // Update scanner status
+        function updateScannerStatus() {
+            const statusElement = document.getElementById('scanner-status');
+            const progressElement = document.getElementById('scan-progress');
+            
+            if (window.deepfakeDetector) {
+                statusElement.textContent = 'Deepfake scanner jest wczy i dziaa';
+                statusElement.style.color = 'green';
+                progressElement.textContent = 'Skanowanie w toku...';
+            } else {
+                statusElement.textContent = 'Deepfake scanner nie jest dostpny';
+                statusElement.style.color = 'red';
+                progressElement.textContent = 'Oczekiwanie na wczenie skanera...';
+            }
+        }
+
+        // Add dynamic images after 3 seconds
+        setTimeout(() => {
+            const dynamicContainer = document.getElementById('dynamic-images');
+            const newImages = [
+                { seed: 'dynamic1', title: 'Dynamiczny obraz 1', desc: 'Dodany dynamicznie' },
+                { seed: 'dynamic2', title: 'Dynamiczny obraz 2', desc: 'Równie dodany dynamicznie' },
+                { seed: 'dynamic3', title: 'Dynamiczny obraz 3', desc: 'Trzeci obraz dynamiczny' }
+            ];
+            
+            newImages.forEach(img => {
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                container.innerHTML = `
+                    <h4>${img.title}</h4>
+                    <p>${img.desc}</p>
+                    <img src="https://picsum.photos/seed/${img.seed}/400/300.jpg" alt="${img.title}">
+                `;
+                dynamicContainer.appendChild(container);
+            });
+            
+            updateScannerStatus();
+        }, 3000);
+
+        // Add performance test images after 5 seconds
+        setTimeout(() => {
+            const perfContainer = document.getElementById('performance-test');
+            for (let i = 0; i < 12; i++) {
+                const img = document.createElement('img');
+                img.src = `https://picsum.photos/seed/perf${i}/100/100.jpg`;
+                img.alt = `Performance test ${i}`;
+                img.style.margin = '5px';
+                img.style.border = '1px solid #ccc';
+                perfContainer.appendChild(img);
+            }
+            
+            updateScannerStatus();
+        }, 5000);
+
+        // Manual scan controls
+        function startManualScan() {
+            if (window.deepfakeDetector) {
+                window.deepfakeDetector.startScanning();
+                alert('Rozpoczto skanowanie rczne');
+            } else {
+                alert('Deepfake scanner nie jest dostpny');
+            }
+        }
+
+        function stopManualScan() {
+            if (window.deepfakeDetector) {
+                window.deepfakeDetector.stopScanning();
+                alert('Zatrzymano skanowanie');
+            } else {
+                alert('Deepfake scanner nie jest dostpny');
+            }
+        }
+
+        function clearWarnings() {
+            // Remove all warning overlays
+            const warnings = document.querySelectorAll('.deepfake-container > div[style*="background: rgba(255, 0, 0"]');
+            warnings.forEach(warning => warning.remove());
+            
+            const labels = document.querySelectorAll('.deepfake-container > div[style*="background: red"]');
+            labels.forEach(label => label.remove());
+            
+            alert('Ostrzeenia zostay wyczone');
+        }
+
+        // Check status every 2 seconds
+        setInterval(updateScannerStatus, 2000);
+        
+        // Initial status check
+        setTimeout(updateScannerStatus, 1000);
+    </script>
+</body>
+</html>
