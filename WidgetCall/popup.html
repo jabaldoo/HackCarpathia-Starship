@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Deepfake Guard</title>
+  <style>
+    body { width: 320px; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: #3c4043; }
+    h3 { margin-top: 0; color: #1a73e8; display: flex; align-items: center; gap: 8px; }
+    .section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
+    .status { margin-bottom: 12px; font-size: 13px; font-weight: 500; }
+    .status.ready { color: #1e8e3e; }
+    .status.missing { color: #d93025; }
+
+    label { display: block; margin-bottom: 5px; font-size: 12px; color: #5f6368; }
+    input { width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; }
+    input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
+
+    .btn-group { display: flex; flex-direction: column; gap: 8px; }
+    button { width: 100%; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; }
+
+    #save { background: #1a73e8; color: white; }
+    #save:hover { background: #1557b0; }
+
+    #startScan { background: #1e8e3e; color: white; }
+    #startScan:hover { background: #18722f; }
+    #startScan.scanning { background: #d93025; }
+    #startScan.scanning:hover { background: #b3261e; }
+
+    .footer { font-size: 11px; color: #70757a; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg> Gemini Guard</h3>
+
+  <div class="section">
+    <div class="status" id="status">Checking configuration...</div>
+    <label for="apiKey">Gemini API Key</label>
+    <input type="password" id="apiKey" placeholder="AIzaSy..." />
+    <button id="save">Update API Key</button>
+  </div>
+
+  <div class="section">
+    <div class="btn-group">
+      <button id="startScan">Start Live Scan</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Works on Google Meet, Zoom, and Teams.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
