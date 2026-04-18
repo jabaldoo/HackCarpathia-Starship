@@ -464,72 +464,12 @@
         if (document.body) {
             processTextNodes(document.body);
             observeChanges();
-            setupTypingFilter();
         } else {
             // If body is not ready, wait for it
             setTimeout(initializeFilter, 100);
         }
     }
 
-    // Typing filter - replaces swear words as user types
-    function setupTypingFilter() {
-        // Filter input fields
-        document.addEventListener('input', function(e) {
-            if (!wordFilteringEnabled) return;
-            
-            const target = e.target;
-            
-            // Handle input fields and textareas
-            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                const originalValue = target.value;
-                const filteredValue = replaceOffensiveWords(originalValue);
-                
-                if (originalValue !== filteredValue) {
-                    // Save cursor position
-                    const cursorPos = target.selectionStart;
-                    const diff = originalValue.length - filteredValue.length;
-                    
-                    target.value = filteredValue;
-                    
-                    // Restore cursor position (adjusted for replaced text)
-                    target.setSelectionRange(cursorPos - diff, cursorPos - diff);
-                }
-            }
-        }, true);
-
-        // Handle contenteditable elements (rich text editors)
-        document.addEventListener('keydown', function(e) {
-            if (!wordFilteringEnabled) return;
-            
-            // Check on space, enter, punctuation, or when leaving field
-            if (e.key === ' ' || e.key === 'Enter' || e.key === ',' || e.key === '.' || 
-                e.key === '!' || e.key === '?' || e.key === ';' || e.key === 'Tab') {
-                
-                const target = e.target;
-                
-                if (target.isContentEditable || target.contentEditable === 'true') {
-                    // For contenteditable, process text nodes
-                    processTextNodes(target);
-                }
-            }
-        }, true);
-
-        // Also filter when leaving input fields (blur event)
-        document.addEventListener('blur', function(e) {
-            if (!wordFilteringEnabled) return;
-            
-            const target = e.target;
-            
-            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                const originalValue = target.value;
-                const filteredValue = replaceOffensiveWords(originalValue);
-                
-                if (originalValue !== filteredValue) {
-                    target.value = filteredValue;
-                }
-            }
-        }, true);
-    }
 
     // Listen for messages from background script
     browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -556,7 +496,7 @@
     browser.storage.sync.get({
         geminiEnabled: true,
         geminiApiKey: '',
-        geminiScanInterval: 60000,
+        geminiScanInterval: 10000,
         geminiShowWarnings: true,
         enableAdultBlock: true,
         enableFilter: true

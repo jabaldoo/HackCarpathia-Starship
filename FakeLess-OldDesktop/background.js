@@ -36,14 +36,7 @@ async function loadEnvApiKey() {
 }
 
 // Initialize on install/startup
-browser.runtime.onInstalled.addListener((details) => {
-  loadEnvApiKey();
-  
-  // Open options page on first install
-  if (details.reason === 'install') {
-    browser.runtime.openOptionsPage();
-  }
-});
+browser.runtime.onInstalled.addListener(loadEnvApiKey);
 browser.runtime.onStartup.addListener(loadEnvApiKey);
 
 // Message handling for all features

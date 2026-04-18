@@ -10,7 +10,7 @@
         
         // Web AI Scanner settings
         geminiEnabled: true,
-        geminiScanInterval: 60000,
+        geminiScanInterval: 10000,
         geminiShowWarnings: true,
         useLocalDetection: true,
         

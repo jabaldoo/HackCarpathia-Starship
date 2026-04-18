@@ -1,5 +1,5 @@
-// FakeLess - Unified Background Script
-// Handles API key loading and messaging between content scripts
+// FakeLess Mobile - Background Script
+// Mobile-optimized background handling
 
 // Load API key from .env file
 async function loadEnvApiKey() {
@@ -8,7 +8,7 @@ async function loadEnvApiKey() {
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.log('FakeLess: No .env file found, using stored API key');
+      console.log('FakeLess Mobile: No .env file found');
       return;
     }
 
@@ -28,41 +28,20 @@ async function loadEnvApiKey() {
     if (env.GOOGLE_API_KEY) {
       await browser.storage.local.set({ geminiApiKey: env.GOOGLE_API_KEY });
       await browser.storage.sync.set({ geminiApiKey: env.GOOGLE_API_KEY });
-      console.log('FakeLess: API Key loaded from .env');
+      console.log('FakeLess Mobile: API Key loaded from .env');
     }
   } catch (error) {
-    console.log('FakeLess: Using stored API key');
+    console.log('FakeLess Mobile: Using stored API key');
   }
 }
 
 // Initialize on install/startup
-browser.runtime.onInstalled.addListener((details) => {
-  loadEnvApiKey();
-  
-  // Open options page on first install
-  if (details.reason === 'install') {
-    browser.runtime.openOptionsPage();
-  }
-});
+browser.runtime.onInstalled.addListener(loadEnvApiKey);
 browser.runtime.onStartup.addListener(loadEnvApiKey);
 
-// Message handling for all features
+// Message handling
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Video call widget - broadcast toggle to all frames
-  if (message.action === "broadcastToggle") {
-    browser.tabs.query({active: true, currentWindow: true}).then(tabs => {
-      tabs.forEach(tab => {
-        browser.tabs.sendMessage(tab.id, {action: "toggleScan"}).catch(() => {});
-      });
-    });
-  }
-  
-  // Video call widget - UI updates
-  if (message.action === "updateUI") {
-    browser.tabs.sendMessage(sender.tab.id, message).catch(() => {});
-  }
-  
-  // Web scanner - manual scan trigger
+  // Manual scan trigger
   if (message.action === "manualScan") {
     browser.tabs.query({active: true, currentWindow: true}).then(tabs => {
       tabs.forEach(tab => {
@@ -82,6 +61,26 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
   }
+  
+  // Get current tab info for mobile
+  if (message.action === "getTabInfo") {
+    browser.tabs.query({active: true, currentWindow: true}).then(tabs => {
+      if (sendResponse) {
+        sendResponse({
+          url: tabs[0]?.url || '',
+          title: tabs[0]?.title || ''
+        });
+      }
+    });
+    return true; // Keep channel open for async
+  }
+});
+
+// Handle browser action click (mobile-friendly)
+browser.browserAction.onClicked.addListener(() => {
+  browser.tabs.create({
+    url: browser.runtime.getURL('options.html')
+  });
 });
 
 // Initial load

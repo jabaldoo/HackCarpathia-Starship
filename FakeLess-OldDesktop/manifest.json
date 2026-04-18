@@ -48,19 +48,12 @@
 
   "options_page": "options.html",
 
-  "options_ui": {
-    "page": "options.html",
-    "browser_style": true,
-    "open_in_tab": true
-  },
-
   "browser_action": {
-    "default_title": "FakeLess - Click to open Settings",
+    "default_title": "FakeLess",
     "default_icon": {
       "16": "logo_bez_tla.png",
       "32": "logo_bez_tla.png"
-    },
-    "default_popup": "popup.html"
+    }
   },
 
   "web_accessible_resources": [

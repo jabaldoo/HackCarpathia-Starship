@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FakeLess - Opcje</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .section h2 {
+            color: #1890ff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #1890ff;
+            padding-bottom: 8px;
+        }
+        
+        .option {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            background-color: #1890ff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background-color: #40a9ff;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .api-section {
+            background: linear-gradient(135deg, #001529, #002140);
+            color: white;
+            border: 1px solid #1890ff;
+        }
+        
+        .api-section h2 {
+            color: #1890ff;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .api-section label {
+            color: #a0a0a0;
+        }
+        
+        .api-section .description {
+            color: #a0a0a0;
+        }
+        
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-badge {
+            background: #1890ff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .stats {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        
+        .stats h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .stats p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FakeLess</h1>
+        <p class="subtitle">
+            Kompleksowa ochrona przed deepfake, AI-generowanymi obrazami i nieodpowiednimi treściami
+        </p>
+        
+        <div class="feature-list">
+            <span class="feature-badge">Wykrywanie AI na stronach</span>
+            <span class="feature-badge">Ochrona wideorozmów</span>
+            <span class="feature-badge">Filtrowanie treści</span>
+            <span class="feature-badge">Blokowanie pornografii</span>
+        </div>
+
+        <div class="section api-section">
+            <h2>Klucz API Google Gemini</h2>
+            <p style="color: #a0a0a0; margin-bottom: 15px;">
+                Wymagany do wykrywania deepfake w wideorozmowach i analizy obrazów AI. 
+                Możesz również umieścić klucz w pliku .env w formacie: GOOGLE_API_KEY=twój_klucz
+            </p>
+            
+            <div class="option">
+                <label for="geminiApiKey">Klucz API Gemini:</label>
+                <input type="password" id="geminiApiKey" placeholder="Wpisz swój klucz API Google Gemini">
+                <div class="description">
+                    Klucz API z Google AI Studio. Wymagany dla pełnej funkcjonalności.
+                </div>
+            </div>
+
+            <div class="option">
+                <button onclick="window.open('https://aistudio.google.com/app/apikey', '_blank')" style="background: #4285f4; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 0;">
+                    Uzyskaj darmowy klucz API
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Skaner AI dla stron internetowych</h2>
+            
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="geminiEnabled" checked>
+                    Włącz skaner AI
+                </label>
+                <div class="description">
+                    Analizuje obrazy na stronach pod kątem AI-generowanych treści
+                </div>
+            </div>
+
+            <div class="option">
+                <label for="geminiScanInterval">Częstotliwość skanowania:</label>
+                <select id="geminiScanInterval">
+                    <option value="5000">Często - co 5 sekund</option>
+                    <option value="10000" selected>Standardowo - co 10 sekund</option>
+                    <option value="30000">Rzadko - co 30 sekund</option>
+                    <option value="60000">Bardzo rzadko - co 60 sekund</option>
+                </select>
+            </div>
+
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="useLocalDetection" checked>
+                    Użyj lokalnego wykrywania (bez API)
+                </label>
+                <div class="description">
+                    Gdy brak klucza API, używa lokalnej analizy obrazów (mniej dokładne)
+                </div>
+            </div>
+
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="geminiShowWarnings" checked>
+                    Pokazuj ostrzeżenia AI
+                </label>
+                <div class="description">
+                    Wyświetla powiadomienia o wykrytych AI-obrazach
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Ochrona wideorozmów (Google Meet, Zoom, Teams)</h2>
+            
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="videoCallProtection" checked>
+                    Włącz ochronę wideorozmów
+                </label>
+                <div class="description">
+                    Wyświetla widget w wideorozmowach do wykrywania deepfake w czasie rzeczywistym
+                </div>
+            </div>
+            
+            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                Podczas wideorozmowy kliknij przycisk "START LIVE SCAN" w widgetu FakeLess, 
+                aby analizować strumień wideo pod kątem deepfake.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Filtrowanie treści i ochrona rodzicielska</h2>
+            
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="enableFilter" checked>
+                    Włącz filtr wulgaryzmów
+                </label>
+                <div class="description">
+                    Zastępuje niecenzuralne słowa znakiem # na stronach internetowych
+                </div>
+            </div>
+
+            <div class="option">
+                <label>
+                    <input type="checkbox" id="enableAdultBlock" checked>
+                    Blokuj treści dla dorosłych (pornografia)
+                </label>
+                <div class="description">
+                    Blokuje strony pornograficzne i wyszukiwanie nieodpowiednich treści na Google
+                </div>
+            </div>
+
+            <div class="option">
+                <label for="replacementChar">Znak zastępczy:</label>
+                <input type="text" id="replacementChar" value="#" maxlength="1" style="width: 50px;">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Statystyki</h2>
+            <div class="stats">
+                <h3>Ochrona w liczbach:</h3>
+                <p id="totalWords">Słów w bazie: <strong>300+</strong></p>
+                <p id="filteredCount">Zablokowanych treści: <strong>0</strong></p>
+                <p id="pagesFiltered">Przetworzonych stron: <strong>0</strong></p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="saveSettings">Zapisz ustawienia</button>
+            <button id="resetSettings">Przywróć domyślne</button>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

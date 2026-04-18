@@ -8,7 +8,7 @@
         constructor() {
             this.isEnabled = true;
             this.apiKey = null;
-            this.scanInterval = 60000; // 60 seconds default
+            this.scanInterval = 10000;
             this.scanTimer = null;
             this.isScanning = false;
             this.detectedImages = new Set();
@@ -360,7 +360,7 @@
         async updateSettings(settings) {
             this.isEnabled = settings.geminiEnabled !== false;
             this.apiKey = settings.geminiApiKey || '';
-            this.scanInterval = settings.geminiScanInterval || 60000;
+            this.scanInterval = settings.geminiScanInterval || 10000;
             this.useLocalDetection = settings.useLocalDetection !== false;
             
             this.stopScanning();
