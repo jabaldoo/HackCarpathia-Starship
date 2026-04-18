@@ -22,7 +22,7 @@ Internet to potężne narzędzie, ale skrywa wiele zagrożeń. FakeLess działa 
 
 ## 🚀 Instalacja i Uruchomienie
 
-Aby zainstalować rozszerzenie w trybie deweloperskim, postępuj zgodnie z poniższą instrukcją:
+Aby zainstalować rozszerzenie w przegladarce uruchom plik manifest.json zgodnie z poniższą instrukcją:
 
 1. **Sklonuj repozytorium:**
    ```bash
