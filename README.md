@@ -26,4 +26,5 @@ Aby zainstalować rozszerzenie w trybie deweloperskim, postępuj zgodnie z poni�
 
 1. **Sklonuj repozytorium:**
    ```bash
-   git clone [https://github.com/jabaldoo/HackCarpathia-Starship](https://github.com/jabaldoo/HackCarpathia-Starship)
+   git clone [https://github.com/jabaldoo/HackCarpathia-Starship]
+   cd HackCarpathia-Starship
