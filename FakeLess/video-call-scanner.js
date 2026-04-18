@@ -11,14 +11,38 @@
   console.log('FakeLess: Video call scanner loaded');
 
   async function init() {
-    // Load API key
+    // Load API key from local storage (user's local storage)
     const data = await browser.storage.local.get('geminiApiKey');
     apiKey = data.geminiApiKey;
-    
-    // Also try sync storage
+
+    if (apiKey) {
+      console.log('FakeLess: API key loaded from local storage');
+    }
+
+    // Fallback to .env file (last resort)
     if (!apiKey) {
-      const syncData = await browser.storage.sync.get('geminiApiKey');
-      apiKey = syncData.geminiApiKey;
+      try {
+        const url = browser.runtime.getURL('.env');
+        const response = await fetch(url);
+        if (response.ok) {
+          const text = await response.text();
+          const env = {};
+          text.split('\n').forEach(line => {
+            const parts = line.split('=');
+            if (parts.length >= 2) {
+              const key = parts[0].trim();
+              const value = parts.slice(1).join('=').trim();
+              env[key] = value;
+            }
+          });
+          if (env.GOOGLE_API_KEY) {
+            apiKey = env.GOOGLE_API_KEY;
+            console.log('FakeLess: API key loaded from .env');
+          }
+        }
+      } catch (e) {
+        console.log('FakeLess: Could not load .env');
+      }
     }
 
     // Check for active video every 2 seconds
@@ -146,10 +170,6 @@
       if (!apiKey) {
         const data = await browser.storage.local.get('geminiApiKey');
         apiKey = data.geminiApiKey;
-        if (!apiKey) {
-          const syncData = await browser.storage.sync.get('geminiApiKey');
-          apiKey = syncData.geminiApiKey;
-        }
       }
 
       if (!apiKey) {

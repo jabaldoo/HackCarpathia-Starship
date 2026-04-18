@@ -34,27 +34,58 @@
     };
 
     function loadSettings() {
+        // Load API key from local storage only (user's local storage)
+        browser.storage.local.get('geminiApiKey', function(items) {
+            console.log('FakeLess: Loaded API key from local storage:', items);
+            
+            const apiKeyField = document.getElementById('geminiApiKey');
+            if (apiKeyField) {
+                apiKeyField.value = items.geminiApiKey || '';
+                console.log('FakeLess: API key field value set to:', apiKeyField.value);
+            }
+        });
+        
         browser.storage.sync.get(defaultSettings, function(items) {
-            // API Key
-            document.getElementById('geminiApiKey').value = items.geminiApiKey || '';
+            console.log('FakeLess: Loaded other settings from storage:', items);
             
             // Web AI Scanner
-            document.getElementById('geminiEnabled').checked = items.geminiEnabled;
-            document.getElementById('geminiScanInterval').value = items.geminiScanInterval;
-            document.getElementById('geminiShowWarnings').checked = items.geminiShowWarnings;
-            document.getElementById('useLocalDetection').checked = items.useLocalDetection !== false;
+            const geminiEnabled = document.getElementById('geminiEnabled');
+            if (geminiEnabled) geminiEnabled.checked = items.geminiEnabled;
+            
+            const geminiScanInterval = document.getElementById('geminiScanInterval');
+            if (geminiScanInterval) geminiScanInterval.value = items.geminiScanInterval;
+            
+            const geminiShowWarnings = document.getElementById('geminiShowWarnings');
+            if (geminiShowWarnings) geminiShowWarnings.checked = items.geminiShowWarnings;
+            
+            const useLocalDetection = document.getElementById('useLocalDetection');
+            if (useLocalDetection) useLocalDetection.checked = items.useLocalDetection !== false;
             
             // Video Call
-            document.getElementById('videoCallProtection').checked = items.videoCallProtection !== false;
+            const videoCallProtection = document.getElementById('videoCallProtection');
+            if (videoCallProtection) videoCallProtection.checked = items.videoCallProtection !== false;
             
             // Content Filter
-            document.getElementById('enableFilter').checked = items.enableFilter;
-            document.getElementById('enableAdultBlock').checked = items.enableAdultBlock !== false;
-            document.getElementById('replacementChar').value = items.replacementChar;
-            document.getElementById('filterStrength').value = items.filterStrength;
-            document.getElementById('excludeSocialMedia').checked = items.excludeSocialMedia;
-            document.getElementById('excludeForums').checked = items.excludeForums;
-            document.getElementById('excludeNews').checked = items.excludeNews;
+            const enableFilter = document.getElementById('enableFilter');
+            if (enableFilter) enableFilter.checked = items.enableFilter;
+            
+            const enableAdultBlock = document.getElementById('enableAdultBlock');
+            if (enableAdultBlock) enableAdultBlock.checked = items.enableAdultBlock !== false;
+            
+            const replacementChar = document.getElementById('replacementChar');
+            if (replacementChar) replacementChar.value = items.replacementChar;
+            
+            const filterStrength = document.getElementById('filterStrength');
+            if (filterStrength) filterStrength.value = items.filterStrength;
+            
+            const excludeSocialMedia = document.getElementById('excludeSocialMedia');
+            if (excludeSocialMedia) excludeSocialMedia.checked = items.excludeSocialMedia;
+            
+            const excludeForums = document.getElementById('excludeForums');
+            if (excludeForums) excludeForums.checked = items.excludeForums;
+            
+            const excludeNews = document.getElementById('excludeNews');
+            if (excludeNews) excludeNews.checked = items.excludeNews;
         });
 
         browser.storage.local.get(['stats'], function(items) {
@@ -63,46 +94,38 @@
                 updateStats();
             }
         });
-        
-        // Also check local storage for API key from .env
-        browser.storage.local.get(['geminiApiKey'], function(localItems) {
-            if (localItems.geminiApiKey) {
-                const apiKeyField = document.getElementById('geminiApiKey');
-                if (apiKeyField && !apiKeyField.value) {
-                    apiKeyField.value = localItems.geminiApiKey;
-                }
-            }
-        });
     }
 
     function saveSettings() {
         const settings = {
-            geminiApiKey: document.getElementById('geminiApiKey').value,
-            geminiEnabled: document.getElementById('geminiEnabled').checked,
-            geminiScanInterval: parseInt(document.getElementById('geminiScanInterval').value),
-            geminiShowWarnings: document.getElementById('geminiShowWarnings').checked,
-            useLocalDetection: document.getElementById('useLocalDetection').checked,
-            videoCallProtection: document.getElementById('videoCallProtection').checked,
-            enableFilter: document.getElementById('enableFilter').checked,
-            enableAdultBlock: document.getElementById('enableAdultBlock').checked,
-            replacementChar: document.getElementById('replacementChar').value,
-            filterStrength: document.getElementById('filterStrength').value,
-            excludeSocialMedia: document.getElementById('excludeSocialMedia').checked,
-            excludeForums: document.getElementById('excludeForums').checked,
-            excludeNews: document.getElementById('excludeNews').checked
+            geminiEnabled: document.getElementById('geminiEnabled')?.checked || false,
+            geminiScanInterval: parseInt(document.getElementById('geminiScanInterval')?.value) || 60000,
+            geminiShowWarnings: document.getElementById('geminiShowWarnings')?.checked || false,
+            useLocalDetection: document.getElementById('useLocalDetection')?.checked || false,
+            videoCallProtection: document.getElementById('videoCallProtection')?.checked || false,
+            enableFilter: document.getElementById('enableFilter')?.checked || false,
+            enableAdultBlock: document.getElementById('enableAdultBlock')?.checked || false,
+            replacementChar: document.getElementById('replacementChar')?.value || '#',
+            filterStrength: document.getElementById('filterStrength')?.value || 'moderate',
+            excludeSocialMedia: document.getElementById('excludeSocialMedia')?.checked || false,
+            excludeForums: document.getElementById('excludeForums')?.checked || false,
+            excludeNews: document.getElementById('excludeNews')?.checked || false
         };
 
-        // Save to sync storage
+        const apiKey = document.getElementById('geminiApiKey')?.value || '';
+
+        // Save API key to local storage only (user's local storage)
+        browser.storage.local.set({ geminiApiKey: apiKey }, function() {
+            console.log('FakeLess: API Key saved to local storage:', apiKey);
+        });
+
+        // Save other settings to sync storage
         browser.storage.sync.set(settings, function() {
             if (browser.runtime.lastError) {
                 showStatus('Błąd zapisu: ' + browser.runtime.lastError.message, 'error');
             } else {
-                showStatus('Ustawienia zapisane pomyślnie!', 'success');
-                
-                // Also save API key to local storage for .env compatibility
-                if (settings.geminiApiKey) {
-                    browser.storage.local.set({ geminiApiKey: settings.geminiApiKey });
-                }
+                console.log('FakeLess: Settings saved successfully');
+                showStatus('Ustawienia zapisane! Klucz: ' + apiKey.substring(0, 10) + '...', 'success');
                 
                 // Notify all content scripts
                 browser.tabs.query({}, function(tabs) {
@@ -143,14 +166,20 @@
 
     document.addEventListener('DOMContentLoaded', loadSettings);
 
-    document.getElementById('saveSettings').addEventListener('click', saveSettings);
-    document.getElementById('resetSettings').addEventListener('click', resetSettings);
+    const saveBtn = document.getElementById('saveSettings');
+    if (saveBtn) saveBtn.addEventListener('click', saveSettings);
+    
+    const resetBtn = document.getElementById('resetSettings');
+    if (resetBtn) resetBtn.addEventListener('click', resetSettings);
 
-    document.getElementById('replacementChar').addEventListener('input', function(e) {
-        if (e.target.value.length > 1) {
-            e.target.value = e.target.value.charAt(0);
-        }
-    });
+    const replacementCharInput = document.getElementById('replacementChar');
+    if (replacementCharInput) {
+        replacementCharInput.addEventListener('input', function(e) {
+            if (e.target.value.length > 1) {
+                e.target.value = e.target.value.charAt(1);
+            }
+        });
+    }
 
     browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message.action === 'updateStats') {
