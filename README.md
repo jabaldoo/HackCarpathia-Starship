@@ -4,6 +4,8 @@
 
 ---
 
+[![FakeLess Official Video](https://img.youtube.com/vi/mYVQlen9C6M/maxresdefault.jpg)](https://www.youtube.com/watch?v=mYVQlen9C6M)
+
 ## 🌟 O projekcie
 
 Internet to potężne narzędzie, ale skrywa wiele zagrożeń. FakeLess działa jako inteligentny filtr, który w czasie rzeczywistym dba o to, co widzi Twoje dziecko. Nasze rozwiązanie skupia się nie tylko na statycznych stronach, ale przede wszystkim na dynamicznej komunikacji wideo.
