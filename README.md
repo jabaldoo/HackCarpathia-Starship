@@ -3,8 +3,14 @@
 **FakeLess** to innowacyjne rozszerzenie do przeglądarki stworzone z myślą o bezpieczeństwie dzieci i nastolatków w sieci. Wykorzystujemy zaawansowane algorytmy sztucznej inteligencji, aby internet stał się przyjaznym miejscem do nauki, zabawy i nawiązywania relacji bez obawy o szkodliwe treści.
 
 ---
+## 📺 Demo Video
 
-[![FakeLess Official Video](https://img.youtube.com/vi/mYVQlen9C6M/maxresdefault.jpg)](https://www.youtube.com/watch?v=mYVQlen9C6M)
+<div align="center">
+  <video src="TU_WKLEJ_LINK_PO_PRZECIAGNIECIU_PLIKU" width="100%" controls title="FakeLess Demo">
+    Twoja przeglądarka nie obsługuje odtwarzacza wideo.
+  </video>
+  <p><i>Możesz również obejrzeć wideo na <a href="https://www.youtube.com/watch?v=mYVQlen9C6M">YouTube</a></i></p>
+</div>
 
 ## 🌟 O projekcie
 
