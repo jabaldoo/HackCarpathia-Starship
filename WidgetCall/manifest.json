@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Gemini Deepfake Call Guard",
-  "version": "1.0",
-  "description": "Uses Gemini AI to detect deepfakes in real-time video calls.",
+  "name": "Gemini Deepfake Detector",
+  "version": "1.5",
+  "description": "Real-time AI deepfake detection for video calls with visual summaries.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
     "https://*.google.com/*",
     "https://*.zoom.us/*",
     "https://*.microsoft.com/*",
+    "https://*.live.com/*",
     "https://generativelanguage.googleapis.com/*"
   ],
   "action": {
@@ -22,10 +23,12 @@
       "matches": [
         "*://meet.google.com/*",
         "*://*.zoom.us/*",
-        "*://teams.microsoft.com/*"
+        "*://teams.microsoft.com/*",
+        "*://teams.live.com/*"
       ],
       "js": ["content.js"],
-      "css": ["style.css"]
+      "css": ["style.css"],
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [
@@ -36,7 +39,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "gemini-call-guard@jabaldoo.dev"
+      "id": "deepfake-detector@jabaldoo.dev"
     }
   }
 }

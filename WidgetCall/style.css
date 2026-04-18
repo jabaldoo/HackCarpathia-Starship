@@ -2,34 +2,39 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  width: 280px;
-  background: white;
+  width: 300px;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
   z-index: 2147483647;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow: hidden;
   border: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
+  min-height: 100px;
 }
 
 .gemini-header {
   background: #1a73e8;
-  color: white;
-  padding: 10px 15px;
+  color: white !important;
+  padding: 12px 15px;
   cursor: move;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
+}
+
+.gemini-header span {
+  color: white !important;
 }
 
 #gemini-close {
   background: none;
   border: none;
-  color: white;
+  color: white !important;
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -38,20 +43,54 @@
 
 .gemini-content {
   padding: 15px;
-  max-height: 300px;
-  overflow-y: auto;
+  background: white;
+  display: flex;
+  flex-direction: column;
 }
 
 #gemini-status {
   font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 700;
+  margin-bottom: 12px;
   text-align: center;
+  color: #3c4043;
+}
+
+#gemini-snapshot-container {
+  width: 100%;
+  height: 150px;
+  background: #f1f3f4;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dadce0;
+}
+
+#gemini-snapshot {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#gemini-placeholder {
+  color: #5f6368;
+  font-size: 12px;
+}
+
+.gemini-meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #5f6368;
 }
 
 #gemini-meter {
   height: 8px;
-  background: #f0f0f0;
+  background: #e8eaed;
   border-radius: 4px;
   margin-bottom: 15px;
   overflow: hidden;
@@ -60,18 +99,26 @@
 #gemini-progress {
   height: 100%;
   width: 0%;
-  transition: width 0.5s ease, background 0.5s ease;
+  background: #1a73e8;
+  transition: width 0.5s ease-in-out;
 }
 
 #gemini-results {
   font-size: 12px;
-  color: #5f6368;
-  line-height: 1.4;
+  color: #3c4043;
+  line-height: 1.5;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid #eee;
 }
 
 .gemini-footer {
-  padding: 10px 15px;
-  border-top: 1px solid #f0f0f0;
+  padding: 12px 15px;
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
 }
 
 #gemini-scan-toggle {
@@ -80,12 +127,12 @@
   border: none;
   border-radius: 6px;
   background: #1a73e8;
-  color: white;
-  font-weight: bold;
+  color: white !important;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  font-size: 13px;
 }
 
-#gemini-scan-toggle:hover {
-  filter: brightness(0.9);
+#gemini-scan-toggle.scanning {
+  background: #d93025;
 }
