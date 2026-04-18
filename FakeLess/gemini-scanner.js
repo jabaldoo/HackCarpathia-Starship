@@ -20,25 +20,19 @@
 
         async loadSettings() {
             try {
-                // Try sync storage first, then local (for .env loaded keys)
+                // Load API key from local storage only (user's local storage)
+                const localData = await browser.storage.local.get('geminiApiKey');
+                
+                // Load other settings from sync storage
                 let settings = await browser.storage.sync.get({
                     geminiEnabled: true,
-                    geminiApiKey: '',
                     geminiScanInterval: 10000,
                     geminiShowWarnings: true,
                     useLocalDetection: true
                 });
                 
-                // Also check local storage for API key (from .env)
-                const localData = await browser.storage.local.get('geminiApiKey');
-                if (localData.geminiApiKey && !settings.geminiApiKey) {
-                    settings.geminiApiKey = localData.geminiApiKey;
-                    // Sync it back to sync storage
-                    await browser.storage.sync.set({ geminiApiKey: localData.geminiApiKey });
-                }
-                
                 this.isEnabled = settings.geminiEnabled;
-                this.apiKey = settings.geminiApiKey;
+                this.apiKey = localData.geminiApiKey || '';
                 this.scanInterval = settings.geminiScanInterval;
                 this.useLocalDetection = settings.useLocalDetection !== false;
                 
@@ -90,15 +84,14 @@
             console.log('FakeLess: Starting AI screen analysis...');
 
             try {
-                const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-                const activeTab = tabs[0];
+                const response = await browser.runtime.sendMessage({ action: 'captureScreen' });
                 
-                if (!activeTab) {
-                    console.error('No active tab found');
+                if (!response || !response.success) {
+                    console.error('Failed to capture screen:', response?.error);
                     return;
                 }
                 
-                const dataUrl = await browser.tabs.captureVisibleTab(activeTab.id, { format: 'png' });
+                const dataUrl = response.dataUrl;
                 const analysis = await this.analyzeWithGemini(dataUrl);
                 
                 if (analysis && analysis.containsAIImages) {

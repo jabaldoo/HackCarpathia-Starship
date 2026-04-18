@@ -82,6 +82,16 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
   }
+
+  // Screen capture for AI scanner
+  if (message.action === "captureScreen") {
+    browser.tabs.captureVisibleTab(null, { format: 'png' }).then(dataUrl => {
+      sendResponse({ success: true, dataUrl: dataUrl });
+    }).catch(error => {
+      sendResponse({ success: false, error: error.message });
+    });
+    return true; // Keep message channel open for async response
+  }
 });
 
 // Initial load

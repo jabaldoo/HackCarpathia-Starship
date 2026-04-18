@@ -36,3 +36,9 @@ Aby zainstalować rozszerzenie w przegladarce uruchom plik manifest.json zgodnie
    ```bash
    git clone [https://github.com/jabaldoo/HackCarpathia-Starship]
    cd HackCarpathia-Starship
+2. **Uruchom rozszerzenie:**
+   - Otwórz `about:debugging` w przeglądarce
+   - Kliknij "This Firefox" → "Load Temporary Add-on"
+   - Wybierz plik `manifest.json` z katalogu `FakeLess`
+   3. **Podążaj za krótką instrukcją aby otrzymać własny kod API**
+   4. **Ciesz się bezpieczeństwem swoim, swoich dzieci jak i bliskich**
