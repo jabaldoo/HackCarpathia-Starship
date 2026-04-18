@@ -5,26 +5,24 @@
   let apiKey = null;
   let faceBox = null;
 
-  console.log('Gemini Guard: Content script loaded');
+  console.log('Fakeless: Content script loaded');
 
   async function init() {
     // 1. Load API key immediately
     const data = await chrome.storage.local.get('geminiApiKey');
     apiKey = data.geminiApiKey;
-    console.log('Gemini Guard: API Key status:', !!apiKey);
 
-    // 2. Start checking for a meeting/call (video elements)
+    // 2. Start checking for a meeting/call
     const callCheckInterval = setInterval(() => {
       const videos = Array.from(document.querySelectorAll('video'));
       const activeVideo = videos.find(v => v.offsetWidth > 100 && v.readyState >= 2);
 
       if (activeVideo && !widget) {
-        console.log('Gemini Guard: Call detected! Injecting widget...');
         createWidget();
       }
     }, 2000);
 
-    // 3. Listen for messages from background/popup
+    // 3. Listen for messages
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === "toggleScan") {
         toggleScan();
@@ -41,34 +39,34 @@
 
     widget = document.createElement('div');
     widget.id = 'gemini-guard-widget';
-    // Forced inline styles to prevent "white box" issue if CSS fails to load
-    widget.style.cssText = 'position:fixed; top:20px; right:20px; width:300px; background:white; border-radius:12px; z-index:2147483647; border:1px solid #ccc; box-shadow:0 10px 30px rgba(0,0,0,0.3); font-family:sans-serif; overflow:hidden; display:flex; flex-direction:column;';
+    // Removed all white backgrounds from forced inline styles
+    widget.style.cssText = 'position:fixed; top:20px; right:20px; width:300px; background:#001529; border-radius:12px; z-index:2147483647; border:1px solid #1890ff; box-shadow:0 10px 40px rgba(0,0,0,0.5); font-family:sans-serif; overflow:hidden; display:flex; flex-direction:column;';
 
     widget.innerHTML = `
-      <div class="gemini-header" style="background:#1a73e8; color:white; padding:12px; cursor:move; display:flex; justify-content:space-between; font-weight:bold;">
-        <span>Gemini Deepfake Guard</span>
+      <div class="gemini-header" style="background:#001529; color:white; padding:12px; cursor:move; display:flex; justify-content:space-between; font-weight:bold; border-bottom: 1px solid #1890ff;">
+        <span>Fakeless Guard</span>
         <button id="gemini-close" style="background:none; border:none; color:white; cursor:pointer; font-size:18px;">×</button>
       </div>
-      <div class="gemini-content" style="padding:15px; color:#333;">
+      <div class="gemini-content" style="padding:15px; color:white; background:#001529;">
         <div style="display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
           <img id="gemini-lvl-icon" style="width:40px; height:40px; display:none;" />
-          <div id="gemini-status" style="font-weight:bold; margin-left:10px;">READY</div>
+          <div id="gemini-status" style="font-weight:bold; margin-left:10px; color:white;">READY</div>
         </div>
-        <div id="gemini-snapshot-container" style="width:100%; height:150px; background:#eee; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #ddd;">
+        <div id="gemini-snapshot-container" style="width:100%; height:150px; background:#000c17; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #1890ff;">
            <img id="gemini-snapshot" style="display:none; max-width:100%; max-height:100%;" />
-           <span id="gemini-placeholder" style="color:#666; font-size:12px;">Waiting for scan...</span>
+           <span id="gemini-placeholder" style="color:#ffffff; font-size:12px;">Waiting for scan...</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-           <span id="gemini-trust-label">Deepfake Score</span>
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; color:white;">
+           <span>Deepfake Score</span>
            <span id="gemini-percent">0%</span>
         </div>
-        <div style="height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:10px;">
-           <div id="gemini-progress" style="height:100%; width:0%; background:#1a73e8; transition:width 0.5s;"></div>
+        <div style="height:8px; background:#000c17; border-radius:4px; overflow:hidden; margin-bottom:10px; border:1px solid #1890ff;">
+           <div id="gemini-progress" style="height:100%; width:0%; background:#1890ff; transition:width 0.5s;"></div>
         </div>
-        <div id="gemini-results" style="font-size:12px; background:#f9f9f9; padding:8px; border-radius:4px; max-height:80px; overflow-y:auto; border:1px solid #eee;">Results will appear here...</div>
+        <div id="gemini-results" style="font-size:12px; background:#000c17; padding:10px; border-radius:6px; max-height:80px; overflow-y:auto; border:1px solid #1890ff; color:white;">Results will appear here...</div>
       </div>
-      <div class="gemini-footer" style="padding:10px; border-top:1px solid #eee;">
-        <button id="gemini-scan-toggle" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">START LIVE SCAN</button>
+      <div class="gemini-footer" style="padding:10px; border-top:1px solid #1890ff; background:#001529;">
+        <button id="gemini-scan-toggle" style="width:100%; padding:10px; background:transparent; color:white; border:1px solid #1890ff; border-radius:6px; cursor:pointer; font-weight:bold; transition: 0.3s;">START LIVE SCAN</button>
       </div>
     `;
 
@@ -76,6 +74,10 @@
 
     document.getElementById('gemini-close').onclick = () => { widget.remove(); widget = null; };
     document.getElementById('gemini-scan-toggle').onclick = () => chrome.runtime.sendMessage({action: "broadcastToggle"});
+
+    const btn = document.getElementById('gemini-scan-toggle');
+    btn.onmouseover = () => { btn.style.background = '#1890ff'; btn.style.color = '#001529'; };
+    btn.onmouseout = () => { if(!isScanning) { btn.style.background = 'transparent'; btn.style.color = 'white'; } };
 
     makeDraggable(widget);
   }
@@ -85,10 +87,20 @@
     isScanning = !isScanning;
     const btn = document.getElementById('gemini-scan-toggle');
     if (isScanning) {
-      if (btn) { btn.innerText = 'STOP SCAN'; btn.style.background = '#d93025'; }
+      if (btn) {
+        btn.innerText = 'STOP SCAN';
+        btn.style.background = '#d93025';
+        btn.style.borderColor = '#d93025';
+        btn.style.color = 'white';
+      }
       startScanning();
     } else {
-      if (btn) { btn.innerText = 'START LIVE SCAN'; btn.style.background = '#1a73e8'; }
+      if (btn) {
+        btn.innerText = 'START LIVE SCAN';
+        btn.style.background = 'transparent';
+        btn.style.borderColor = '#1890ff';
+        btn.style.color = 'white';
+      }
       stopScanning();
     }
   }
@@ -101,10 +113,7 @@
   function stopScanning() {
     clearInterval(scanInterval);
     if (faceBox) faceBox.style.display = 'none';
-    const status = document.getElementById('gemini-status');
-    const icon = document.getElementById('gemini-lvl-icon');
-    if (status) status.innerText = 'SCAN STOPPED';
-    if (icon) icon.style.display = 'none';
+    updateStatusUI('SCAN STOPPED', 'white');
   }
 
   async function performScan() {
@@ -112,7 +121,7 @@
     const video = videos.find(v => v.offsetWidth > 150 && v.readyState >= 2) || videos[0];
 
     if (!video || video.readyState < 2) {
-      updateStatusUI('No video stream found', 'orange');
+      updateStatusUI('No video found', '#f9ab00');
       return;
     }
 
@@ -123,7 +132,7 @@
     ctx.drawImage(video, 0, 0);
     const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
-    updateStatusUI('Capturing...', '#1a73e8');
+    updateStatusUI('CAPTURING...', '#1890ff');
 
     try {
       if (!apiKey) {
@@ -162,7 +171,7 @@
       }
     } catch (e) {
       console.error('Scan Error:', e);
-      updateStatusUI('API Error: ' + e.message, 'red');
+      updateStatusUI('API Error', '#d93025');
     }
   }
 
@@ -187,32 +196,13 @@
     let color = "";
     let iconName = "";
 
-    if (score <= 25) {
-      trustText = "REAL";
-      color = "#1e8e3e";
-      iconName = "lvl1.png";
-    } else if (score <= 50) {
-      trustText = "MOST LIKELY REAL";
-      color = "#8ab4f8";
-      iconName = "lvl2.png";
-    } else if (score <= 75) {
-      trustText = "NOT SO REAL";
-      color = "#f9ab00";
-      iconName = "lvl3.png";
-    } else {
-      trustText = "FAKE";
-      color = "#d93025";
-      iconName = "lvl4.png";
-    }
+    if (score <= 25) { trustText = "REAL"; color = "#1e8e3e"; iconName = "lvl1.png"; }
+    else if (score <= 50) { trustText = "MOST LIKELY REAL"; color = "#8ab4f8"; iconName = "lvl2.png"; }
+    else if (score <= 75) { trustText = "NOT SO REAL"; color = "#f9ab00"; iconName = "lvl3.png"; }
+    else { trustText = "FAKE"; color = "#d93025"; iconName = "lvl4.png"; }
 
-    if (status) {
-      status.innerText = trustText;
-      status.style.color = color;
-    }
-    if (icon) {
-      icon.src = chrome.runtime.getURL('lvl/' + iconName);
-      icon.style.display = 'block';
-    }
+    if (status) { status.innerText = trustText; status.style.color = color; }
+    if (icon) { icon.src = chrome.runtime.getURL('lvl/' + iconName); icon.style.display = 'block'; }
     if (percent) percent.innerText = score + '%';
     if (progress) {
       progress.style.width = score + '%';

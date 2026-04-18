@@ -3,7 +3,7 @@
   top: 20px;
   right: 20px;
   width: 300px;
-  background: #001529; /* Dark Blue */
+  background: #001529 !important; /* Dark Blue */
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   z-index: 2147483647;
@@ -16,8 +16,8 @@
 }
 
 .gemini-header {
-  background: #001529; /* Dark Blue */
-  color: #81d4fa !important; /* Light Blue */
+  background: #001529 !important; /* Dark Blue */
+  color: #ffffff !important; /* White */
   padding: 12px 15px;
   cursor: move;
   display: flex;
@@ -29,13 +29,13 @@
 }
 
 .gemini-header span {
-  color: #81d4fa !important;
+  color: #ffffff !important;
 }
 
 #gemini-close {
-  background: none;
-  border: none;
-  color: #81d4fa !important;
+  background: none !important;
+  border: none !important;
+  color: #ffffff !important;
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -44,7 +44,7 @@
 
 .gemini-content {
   padding: 15px;
-  background: #001529; /* Dark Blue */
+  background: #001529 !important; /* Dark Blue */
   display: flex;
   flex-direction: column;
 }
@@ -54,13 +54,13 @@
   font-weight: 700;
   margin-bottom: 12px;
   text-align: center;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 #gemini-snapshot-container {
   width: 100%;
   height: 150px;
-  background: #000c17; /* Very Dark Blue */
+  background: #000c17 !important; /* Very Dark Blue */
   border-radius: 8px;
   margin-bottom: 15px;
   overflow: hidden;
@@ -77,7 +77,7 @@
 }
 
 #gemini-placeholder {
-  color: #81d4fa;
+  color: #ffffff !important;
   font-size: 12px;
 }
 
@@ -86,12 +86,12 @@
   justify-content: space-between;
   font-size: 12px;
   margin-bottom: 5px;
-  color: #81d4fa;
+  color: #ffffff !important;
 }
 
 #gemini-meter {
   height: 8px;
-  background: #000c17;
+  background: #000c17 !important;
   border-radius: 4px;
   margin-bottom: 15px;
   overflow: hidden;
@@ -107,9 +107,9 @@
 
 #gemini-results {
   font-size: 12px;
-  color: #ffffff;
+  color: #ffffff !important;
   line-height: 1.5;
-  background: #000c17;
+  background: #000c17 !important;
   padding: 10px;
   border-radius: 6px;
   max-height: 100px;
@@ -119,17 +119,17 @@
 
 .gemini-footer {
   padding: 12px 15px;
-  background: #001529;
+  background: #001529 !important;
   border-top: 1px solid #1890ff;
 }
 
 #gemini-scan-toggle {
   width: 100%;
   padding: 10px;
-  border: 1px solid #1890ff;
+  border: 1px solid #1890ff !important;
   border-radius: 6px;
-  background: transparent;
-  color: #81d4fa !important;
+  background: transparent !important;
+  color: #ffffff !important; /* White */
   font-weight: 600;
   cursor: pointer;
   font-size: 13px;
@@ -137,12 +137,12 @@
 }
 
 #gemini-scan-toggle:hover {
-  background: #1890ff;
+  background: #1890ff !important;
   color: #001529 !important;
 }
 
 #gemini-scan-toggle.scanning {
-  background: #d93025;
-  border-color: #d93025;
+  background: #d93025 !important;
+  border-color: #d93025 !important;
   color: white !important;
 }
